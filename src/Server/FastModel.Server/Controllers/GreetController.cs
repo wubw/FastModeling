@@ -1,15 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Web.Http;
+using System.Web.Http.Cors;
 
 namespace FastModel.Server.Controllers
 {
     //[Authorize]
+    [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*")]
     public class GreetController : ApiController
     {
         // GET api/values
         public IEnumerable<string> Get()
         {
-            return new string[] { "Hello, World!" };
+            return new string[] { "Hello, World!1" };
         }
 
         // GET api/values/5
