@@ -4,10 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
+import { DefaultshapeComponent } from './defaultshape.component';
+import { ModelViewerComponent } from './modelviewer.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    DefaultshapeComponent,
+    ModelViewerComponent
   ],
   imports: [
     BrowserModule,

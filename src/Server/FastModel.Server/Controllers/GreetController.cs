@@ -11,7 +11,7 @@ namespace FastModel.Server.Controllers
         // GET api/values
         public IEnumerable<string> Get()
         {
-            return new string[] { "Hello, World!1" };
+            return new string[] { "Greeting from server." };
         }
 
         // GET api/values/5
