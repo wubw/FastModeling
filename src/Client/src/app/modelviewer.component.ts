@@ -14,7 +14,7 @@ import './common/initShaders2.js';
   styleUrls: ['./modelviewer.component.css'],
   queries: { mainviewer : new ViewChild('mainviewer') }
 })
-export class ModelViewerComponent implements OnInit, AfterViewInit {
+export class ModelViewerComponent implements OnInit {
     @ViewChild('mainviewer') mainviewer;
     title = 'model viewer';
 
@@ -49,10 +49,7 @@ export class ModelViewerComponent implements OnInit, AfterViewInit {
             console.log('Failed to set the positions of the vertices');
             return;
         }
-        gl.drawArrays(gl.POINTS, 0, n);
-    }
-    
-    ngAfterViewInit(): void {
+        gl.drawArrays(gl.TRIANGLES, 0, n);
     }
 
     initVertexBuffer(gl, program): number {
