@@ -39,19 +39,45 @@ export class ModelViewerComponent implements OnInit, AfterViewInit {
         gl.clearColor(0.0, 1.0, 0.0, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
 
-        var a_Position = gl.getAttribLocation(program, 'a_Position');
-        if(a_Position < 0) {
-            console.log('Failed to get the storage location of a_Position');
-            return;
-        }
         var a_PointSize = gl.getAttribLocation(program, 'a_PointSize');
         var u_FragColor = gl.getUniformLocation(program, 'u_FragColor');
         gl.uniform4f(u_FragColor, 1.0, 0.0, 0.0, 1.0)
-        gl.vertexAttrib3f(a_Position, 0.0, 0.0, 0.0);
         gl.vertexAttrib1f(a_PointSize, 5.0);
-        gl.drawArrays(gl.POINTS, 0, 1);
+
+        var n = this.initVertexBuffer(gl, program);
+        if(n < 0) {
+            console.log('Failed to set the positions of the vertices');
+            return;
+        }
+        gl.drawArrays(gl.POINTS, 0, n);
     }
     
     ngAfterViewInit(): void {
+    }
+
+    initVertexBuffer(gl, program): number {
+        var vertices = new Float32Array([
+            0.0, 0.5, -0.5, -0.5, 0.5, -0.5
+        ])
+        var n = 3;
+
+        var vertexBuffer = gl.createBuffer();
+        if(!vertexBuffer) {
+            console.log('Failed to create the buffer object');
+            return -1;
+        }
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+        
+        var a_Position = gl.getAttribLocation(program, 'a_Position');
+        if(a_Position < 0) {
+            console.log('Failed to get the storage location of a_Position');
+            return -1;
+        }
+        gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(a_Position);
+
+        return n;
     }
 }
