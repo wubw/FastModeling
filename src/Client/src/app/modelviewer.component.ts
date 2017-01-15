@@ -44,7 +44,11 @@ export class ModelViewerComponent implements OnInit, AfterViewInit {
             console.log('Failed to get the storage location of a_Position');
             return;
         }
+        var a_PointSize = gl.getAttribLocation(program, 'a_PointSize');
+        var u_FragColor = gl.getUniformLocation(program, 'u_FragColor');
+        gl.uniform4f(u_FragColor, 1.0, 0.0, 0.0, 1.0)
         gl.vertexAttrib3f(a_Position, 0.0, 0.0, 0.0);
+        gl.vertexAttrib1f(a_PointSize, 5.0);
         gl.drawArrays(gl.POINTS, 0, 1);
     }
     
