@@ -34,22 +34,48 @@ export class ModelViewerComponent implements OnInit {
             return;
         }
         gl.useProgram(program);
-        
         gl.viewport(0, 0, this.mainviewer.nativeElement.width, this.mainviewer.nativeElement.height);
-        gl.clearColor(0.0, 1.0, 0.0, 1.0);
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
 
-        var a_PointSize = gl.getAttribLocation(program, 'a_PointSize');
-        var u_FragColor = gl.getUniformLocation(program, 'u_FragColor');
-        gl.uniform4f(u_FragColor, 1.0, 0.0, 0.0, 1.0)
-        gl.vertexAttrib1f(a_PointSize, 5.0);
+        this.setRotation(gl, program);
+        this.setPointSize(gl, program);
+        this.setFragmentColor(gl, program);
+        this.setTranslation(gl, program);
 
         var n = this.initVertexBuffer(gl, program);
         if(n < 0) {
             console.log('Failed to set the positions of the vertices');
             return;
         }
+
         gl.drawArrays(gl.TRIANGLES, 0, n);
+    }
+
+    setPointSize(gl, program): void {
+        var a_PointSize = gl.getAttribLocation(program, 'a_PointSize');
+        gl.vertexAttrib1f(a_PointSize, 5.0);
+    }
+
+    setFragmentColor(gl, program): void {
+        var u_FragColor = gl.getUniformLocation(program, 'u_FragColor');
+        gl.uniform4f(u_FragColor, 1.0, 0.0, 0.0, 1.0);
+    }
+
+    setTranslation(gl, program): void {
+        var u_Translation = gl.getUniformLocation(program, 'u_Translation');
+        gl.uniform4f(u_Translation, 0.5, 0.5, 0.0, 0.0);
+    }
+
+    setRotation(gl, program): void {
+        var ANGLE = 90.0;
+        var radian = Math.PI * ANGLE / 180.0;
+        var cosB = Math.cos(radian);
+        var sinB = Math.sin(radian);
+        var u_CosB = gl.getUniformLocation(program, 'u_CosB');
+        var u_SinB = gl.getUniformLocation(program, 'u_SinB');
+        gl.uniform1f(u_CosB, cosB);
+        gl.uniform1f(u_SinB, sinB);
     }
 
     initVertexBuffer(gl, program): number {
