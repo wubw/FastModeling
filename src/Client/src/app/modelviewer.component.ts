@@ -34,10 +34,17 @@ export class ModelViewerComponent implements OnInit, AfterViewInit {
             return;
         }
         gl.useProgram(program);
+        
         gl.viewport(0, 0, this.mainviewer.nativeElement.width, this.mainviewer.nativeElement.height);
         gl.clearColor(0.0, 1.0, 0.0, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
 
+        var a_Position = gl.getAttribLocation(program, 'a_Position');
+        if(a_Position < 0) {
+            console.log('Failed to get the storage location of a_Position');
+            return;
+        }
+        gl.vertexAttrib3f(a_Position, 0.0, 0.0, 0.0);
         gl.drawArrays(gl.POINTS, 0, 1);
     }
     
