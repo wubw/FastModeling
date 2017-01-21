@@ -21,8 +21,7 @@ export class ModelViewerComponent implements OnInit {
     currentAngle = 0.0;
     modelMatrix: any;
     u_ModelMatrix: any;
-    gl: any;
-    n: number;
+    gl: any
 
     ngOnInit(): void {
         if(!this.mainviewer) {
@@ -54,45 +53,15 @@ export class ModelViewerComponent implements OnInit {
 
         this.gl.uniformMatrix4fv(this.u_ModelMatrix, false, xformMatrix.elements);
         
-        this.setPointSize(program);
         this.setFragmentColor(program);
 
-        this.n = this.initVertexBuffer(program);
-        if(this.n < 0) {
+        var n = this.initVertexBuffer(program);
+        if(n < 0) {
             console.log('Failed to set the positions of the vertices');
             return;
         }
 
-        //this.gl.drawArrays(this.gl.TRIANGLES, 0, this.n);
-
-        this.tick();
-    }
-
-    animate():void {
-        var now = Date.now();
-        var elapsed = now - this.g_last;
-        this.g_last = now;
-        var newAngle = this.currentAngle + (this.anglestep * elapsed) / 1000.0;
-        this.currentAngle = (newAngle %= 360.0);
-    }
-
-    tick() {
-        this.animate();
-        console.log(this.currentAngle);
-        this.draw(this.n, this.currentAngle, this.modelMatrix, this.u_ModelMatrix);
-        requestAnimationFrame(()=>this.tick());
-    }
-
-    draw(n, currentAngle, modelMatrix, u_ModelMatrix) {
-        modelMatrix.setRotate(currentAngle, 0, 0, 1);
-        this.gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-        this.gl.drawArrays(this.gl.TRIANGLES, 0, n);
-    }
-
-    setPointSize(program): void {
-        var a_PointSize = this.gl.getAttribLocation(program, 'a_PointSize');
-        this.gl.vertexAttrib1f(a_PointSize, 5.0);
+        this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
     }
 
     setFragmentColor(program): void {
@@ -102,9 +71,10 @@ export class ModelViewerComponent implements OnInit {
 
     initVertexBuffer(program): number {
         var vertices = new Float32Array([
-            0.0, 0.5, -0.5, -0.5, 0.5, -0.5
+            -0.5, 0.5, -0.5, -0.5, 0.5, -0.5,   // first triangle
+            0.5, 0.5, 0.5, -0.5, -0.5, 0.5     // second triangle
         ])
-        var n = 3;
+        var n = 6;
 
         var vertexBuffer = this.gl.createBuffer();
         if(!vertexBuffer) {
