@@ -6,6 +6,7 @@ import { HttpModule } from '@angular/http';
 import { AppComponent } from './app.component';
 import { DefaultshapeComponent } from './defaultshape.component';
 import { ModelViewerComponent } from './modelviewer.component';
+import { RetrieveModelService } from './retrieve.model.service';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,7 @@ import { ModelViewerComponent } from './modelviewer.component';
     FormsModule,
     HttpModule
   ],
-  providers: [],
+  providers: [ RetrieveModelService ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

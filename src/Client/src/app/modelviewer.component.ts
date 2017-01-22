@@ -7,6 +7,8 @@ import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';      
 
+import { RetrieveModelService } from './retrieve.model.service';
+
 @Component({
   selector: 'model-viewer',
   templateUrl: './modelviewer.component.html',
@@ -14,6 +16,8 @@ import 'rxjs/add/operator/catch';
   queries: { mainviewer : new ViewChild('mainviewer') }
 })
 export class ModelViewerComponent implements OnInit {
+    constructor(private retrieveModelService: RetrieveModelService) {}
+    
     @ViewChild('mainviewer') mainviewer;
     title = 'model viewer';
     anglestep = 45.0;
@@ -21,9 +25,14 @@ export class ModelViewerComponent implements OnInit {
     currentAngle = 0.0;
     modelMatrix: any;
     u_ModelMatrix: any;
-    gl: any
+    gl: any;
+    program: any;
 
     ngOnInit(): void {
+        this.retrieveModelService.modelRetrieved().subscribe(m => {
+            this.drawRetrievedModel(m);
+        });
+
         if(!this.mainviewer) {
             console.log('ngOnInit: Fail to retrieve the mainviewer <canvas> element');
         }
@@ -33,18 +42,16 @@ export class ModelViewerComponent implements OnInit {
             return;
         }
         var ir = require("./common/initShaders2");
-        var program = ir.initShaders(this.gl, "app/shader/vshader.glsl", "app/shader/fshader.glsl");
-        if(!program) {
+        this.program = ir.initShaders(this.gl, "app/shader/vshader.glsl", "app/shader/fshader.glsl");
+        if(!this.program) {
             console.log('Failed to init shaders');
             return;
         }
-        this.gl.useProgram(program);
+        this.gl.useProgram(this.program);
         this.gl.viewport(0, 0, this.mainviewer.nativeElement.width, this.mainviewer.nativeElement.height);
-        this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
         var ANGLE = 90.0;
-        this.u_ModelMatrix = this.gl.getUniformLocation(program, 'u_xformMatrix');
+        this.u_ModelMatrix = this.gl.getUniformLocation(this.program, 'u_xformMatrix');
         var cm = require("./common/coun-matrix");
         var xformMatrix = new cm.Matrix4();
         xformMatrix.setTranslate(0.5, 0.5, 0.0);
@@ -53,29 +60,47 @@ export class ModelViewerComponent implements OnInit {
 
         this.gl.uniformMatrix4fv(this.u_ModelMatrix, false, xformMatrix.elements);
         
-        this.setFragmentColor(program);
+        this.setFragmentColor();
 
-        var n = this.initVertexBuffer(program);
-        if(n < 0) {
+        var vertices = new Float32Array([
+            -0.5, 0.5, -0.5, -0.5, 0.5, -0.5,  
+        ]);
+        var n = 3;
+        this.draw(vertices, n);
+    }
+
+    drawRetrievedModel(m) : void {
+        console.log('model retrieved %s', m);
+        var d = JSON.parse(m);
+        var n = d.Vertices.length;
+        var vertices = new Float32Array(n * 2);
+        var i = 0;
+        for(let v of d.Vertices) {
+            vertices[i] = v.X;
+            vertices[i+1] = v.Y;
+            i = i + 2;
+        }
+        this.draw(vertices, n);
+    }
+
+    draw(vertices, n): void {
+        this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+        var ret = this.initVertexBuffer(vertices);
+        if(ret < 0) {
             console.log('Failed to set the positions of the vertices');
             return;
         }
 
-        this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
+        this.gl.drawArrays(this.gl.TRIANGLES, 0, n);
     }
 
-    setFragmentColor(program): void {
-        var u_FragColor = this.gl.getUniformLocation(program, 'u_FragColor');
+    setFragmentColor(): void {
+        var u_FragColor = this.gl.getUniformLocation(this.program, 'u_FragColor');
         this.gl.uniform4f(u_FragColor, 1.0, 0.0, 0.0, 1.0);
     }
 
-    initVertexBuffer(program): number {
-        var vertices = new Float32Array([
-            -0.5, 0.5, -0.5, -0.5, 0.5, -0.5,   // first triangle
-            0.5, 0.5, 0.5, -0.5, -0.5, 0.5     // second triangle
-        ])
-        var n = 6;
-
+    initVertexBuffer(vertices): number {
         var vertexBuffer = this.gl.createBuffer();
         if(!vertexBuffer) {
             console.log('Failed to create the buffer object');
@@ -85,7 +110,7 @@ export class ModelViewerComponent implements OnInit {
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vertexBuffer);
         this.gl.bufferData(this.gl.ARRAY_BUFFER, vertices, this.gl.STATIC_DRAW);
         
-        var a_Position = this.gl.getAttribLocation(program, 'a_Position');
+        var a_Position = this.gl.getAttribLocation(this.program, 'a_Position');
         if(a_Position < 0) {
             console.log('Failed to get the storage location of a_Position');
             return -1;
@@ -93,6 +118,6 @@ export class ModelViewerComponent implements OnInit {
         this.gl.vertexAttribPointer(a_Position, 2, this.gl.FLOAT, false, 0, 0);
         this.gl.enableVertexAttribArray(a_Position);
 
-        return n;
+        return 0;
     }
 }
