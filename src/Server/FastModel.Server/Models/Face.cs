@@ -12,13 +12,17 @@ namespace FastModel.Server.Models
         public double Z { get; set; }
     }
 
+    public class Vector : Point { }
+
     public class Face
     {
         public Face()
         {
-            Vertices = new List<Point>();
+            this.Vertices = new List<Point>();
+            this.Normals = new List<Point>();
         }
 
         public IList<Point> Vertices { get; private set; }    
+        public IList<Point> Normals { get; private set; }
     }
 }

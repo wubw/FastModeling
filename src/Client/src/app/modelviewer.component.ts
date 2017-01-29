@@ -27,6 +27,7 @@ export class ModelViewerComponent implements OnInit {
     lastX: number;
     lastY: number;
     vertices: Float32Array;
+    normals: Float32Array;
     n: number;
 
     constructor(private retrieveModelService: RetrieveModelService) {
@@ -59,7 +60,7 @@ export class ModelViewerComponent implements OnInit {
 
         this.u_ModelMatrix = this.gl.getUniformLocation(this.program, 'u_xformMatrix');
         
-        this.setFragmentColor();
+        this.setLight();
 
         this.tick();
     }
@@ -82,7 +83,7 @@ export class ModelViewerComponent implements OnInit {
         canvas.onmouseup = ev => {
             this.dragging = false;
         }
-        
+
         canvas.onmousemove = ev => {
             var x = ev.clientX, y = ev.clientY;
             if(this.dragging) {
@@ -109,6 +110,16 @@ export class ModelViewerComponent implements OnInit {
             this.vertices[i+2] = v.Z;
             i = i + 3;
         }
+        this.normals = new Float32Array(this.n * 3);
+        i = 0;
+        for(let n of d.Normals) {
+            this.normals[i] = n.X;
+            this.normals[i+1] = n.Y;
+            this.normals[i+2] = n.Z;
+            i = i + 3;
+        }
+        var a_Color = this.gl.getUniformLocation(this.program, 'a_Color');
+        this.gl.uniform4f(a_Color, 1.0, 0.0, 0.0, 1.0);
         this.draw();
     }
 
@@ -118,15 +129,18 @@ export class ModelViewerComponent implements OnInit {
         if(!this.n || this.n <= 0) {
             return;
         }
-        var ret = this.initVertexBuffer(this.vertices);
+        if(!this.initArrayBuffer(this.vertices, 3, this.gl.FLOAT, 'a_Position')) {
+            return;
+        }
+        if(!this.initArrayBuffer(this.normals, 3, this.gl.FLOAT, 'a_Normal')) {
+            return;
+        }
+
         this.modelMatrix.rotate(this.currentAngle[0], 1.0, 0.0, 0.0);
         this.modelMatrix.rotate(this.currentAngle[1], 0.0, 1.0, 0.0);
         this.currentAngle = [0.0, 0.0];
         this.gl.uniformMatrix4fv(this.u_ModelMatrix, false, this.modelMatrix.elements);
-        if(ret < 0) {
-            console.log('Failed to set the positions of the vertices');
-            return;
-        }
+        console.log('draw');
         this.gl.drawArrays(this.gl.TRIANGLES, 0, this.n);
     }
 
@@ -135,29 +149,25 @@ export class ModelViewerComponent implements OnInit {
         requestAnimationFrame(() => {this.tick()});
     }
 
-    setFragmentColor(): void {
-        var u_FragColor = this.gl.getUniformLocation(this.program, 'u_FragColor');
-        this.gl.uniform4f(u_FragColor, 1.0, 0.0, 0.0, 1.0);
+    setLight(): void {
+        var u_LightColor = this.gl.getUniformLocation(this.program, 'u_LightColor');
+        var u_LightDirection = this.gl.getUniformLocation(this.program, 'u_LightDirection');
+        this.gl.uniform3f(u_LightColor, 1.0, 1.0, 1.0);
+        var cm = require("./common/coun-matrix");
+        var lightDirection = new cm.Vector3([0.5, 3.0, 4.0]);
+        lightDirection.normalize();
+        this.gl.uniform3fv(u_LightDirection, lightDirection.elements);
     }
 
-    initVertexBuffer(vertices): number {
-        var vertexBuffer = this.gl.createBuffer();
-        if(!vertexBuffer) {
-            console.log('Failed to create the buffer object');
-            return -1;
-        }
-
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vertexBuffer);
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, vertices, this.gl.STATIC_DRAW);
+    initArrayBuffer(data, num: number, type, attribute:string): boolean {
+        console.log('data,' + attribute + ': ' + data);
+        var buffer = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, data, this.gl.STATIC_DRAW);
+        var a_attribute = this.gl.getAttribLocation(this.program, attribute);
+        this.gl.vertexAttribPointer(a_attribute, num, type, false, 0, 0);
+        this.gl.enableVertexAttribArray(a_attribute);
         
-        var a_Position = this.gl.getAttribLocation(this.program, 'a_Position');
-        if(a_Position < 0) {
-            console.log('Failed to get the storage location of a_Position');
-            return -1;
-        }
-        this.gl.vertexAttribPointer(a_Position, 3, this.gl.FLOAT, false, 0, 0);
-        this.gl.enableVertexAttribArray(a_Position);
-
-        return 0;
-    }
+        return true;
+    } 
 }

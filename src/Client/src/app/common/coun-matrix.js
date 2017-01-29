@@ -740,4 +740,4 @@ var Vector4 = function(opt_src) {
     this.elements = v;
 }
 
-module.exports = {Matrix4: Matrix4}
+module.exports = {Matrix4: Matrix4, Vector3: Vector3}
