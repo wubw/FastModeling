@@ -16,17 +16,23 @@ import { RetrieveModelService } from './retrieve.model.service';
   queries: { mainviewer : new ViewChild('mainviewer') }
 })
 export class ModelViewerComponent implements OnInit {
-    constructor(private retrieveModelService: RetrieveModelService) {}
-    
     @ViewChild('mainviewer') mainviewer;
     title = 'model viewer';
-    anglestep = 45.0;
-    g_last = Date.now();
-    currentAngle = 0.0;
+    currentAngle: number[] = [0.0, 0.0];
     modelMatrix: any;
     u_ModelMatrix: any;
     gl: any;
     program: any;
+    dragging: boolean;
+    lastX: number;
+    lastY: number;
+    vertices: Float32Array;
+    n: number;
+
+    constructor(private retrieveModelService: RetrieveModelService) {
+        var cm = require("./common/coun-matrix");
+        this.modelMatrix = new cm.Matrix4();
+    }
 
     ngOnInit(): void {
         this.retrieveModelService.modelRetrieved().subscribe(m => {
@@ -37,6 +43,7 @@ export class ModelViewerComponent implements OnInit {
             console.log('ngOnInit: Fail to retrieve the mainviewer <canvas> element');
         }
         this.gl  = this.mainviewer.nativeElement.getContext('webgl');
+        this.initEventHandlers(this.mainviewer.nativeElement);
         if (!this.gl) {
             alert("Unable to initialize WebGL. Your browser may not support it.");
             return;
@@ -50,49 +57,82 @@ export class ModelViewerComponent implements OnInit {
         this.gl.useProgram(this.program);
         this.gl.viewport(0, 0, this.mainviewer.nativeElement.width, this.mainviewer.nativeElement.height);
 
-        var ANGLE = 90.0;
         this.u_ModelMatrix = this.gl.getUniformLocation(this.program, 'u_xformMatrix');
-        var cm = require("./common/coun-matrix");
-        var xformMatrix = new cm.Matrix4();
-        xformMatrix.setTranslate(0.5, 0.5, 0.0);
-        xformMatrix.rotate(ANGLE, 0, 0, 1);
-        this.modelMatrix = xformMatrix;
-
-        this.gl.uniformMatrix4fv(this.u_ModelMatrix, false, xformMatrix.elements);
         
         this.setFragmentColor();
 
-        var vertices = new Float32Array([
-            -0.5, 0.5, -0.5, -0.5, 0.5, -0.5,  
-        ]);
-        var n = 3;
-        this.draw(vertices, n);
+        this.tick();
+    }
+
+    initEventHandlers(canvas) {
+        this.dragging = false;
+        this.lastX = -1;
+        this.lastY = -1;
+
+        canvas.onmousedown = ev => {
+            var x = ev.clientX, y = ev.clientY;
+            var rect = ev.target.getBoundingClientRect();
+            if(rect.left <= x && x < rect.right && rect.top <= y && y < rect.bottom) {
+                this.lastX = x;
+                this.lastY = y;
+                this.dragging = true;
+            }
+        }
+
+        canvas.onmouseup = ev => {
+            this.dragging = false;
+        }
+        
+        canvas.onmousemove = ev => {
+            var x = ev.clientX, y = ev.clientY;
+            if(this.dragging) {
+                var factor = 100/canvas.height;
+                var dx = factor * (x - this.lastX);
+                var dy = factor * (y - this.lastY);
+                this.currentAngle[0] = Math.max(Math.min(this.currentAngle[0] + dy, 90.0), -90.0);
+                this.currentAngle[1] = this.currentAngle[1] + dx;
+            }
+            this.lastX = x;
+            this.lastY = y;
+        }
     }
 
     drawRetrievedModel(m) : void {
         console.log('model retrieved %s', m);
         var d = JSON.parse(m);
-        var n = d.Vertices.length;
-        var vertices = new Float32Array(n * 2);
+        this.n = d.Vertices.length;
+        this.vertices = new Float32Array(this.n * 3);
         var i = 0;
         for(let v of d.Vertices) {
-            vertices[i] = v.X;
-            vertices[i+1] = v.Y;
-            i = i + 2;
+            this.vertices[i] = v.X;
+            this.vertices[i+1] = v.Y;
+            this.vertices[i+2] = v.Z;
+            i = i + 3;
         }
-        this.draw(vertices, n);
+        this.draw();
     }
 
-    draw(vertices, n): void {
+    draw(): void {
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-        var ret = this.initVertexBuffer(vertices);
+        if(!this.n || this.n <= 0) {
+            return;
+        }
+        var ret = this.initVertexBuffer(this.vertices);
+        this.modelMatrix.rotate(this.currentAngle[0], 1.0, 0.0, 0.0);
+        this.modelMatrix.rotate(this.currentAngle[1], 0.0, 1.0, 0.0);
+        this.currentAngle = [0.0, 0.0];
+        this.gl.uniformMatrix4fv(this.u_ModelMatrix, false, this.modelMatrix.elements);
         if(ret < 0) {
             console.log('Failed to set the positions of the vertices');
             return;
         }
+        this.gl.drawArrays(this.gl.TRIANGLES, 0, this.n);
+    }
 
-        this.gl.drawArrays(this.gl.TRIANGLES, 0, n);
+    tick() {
+        this.draw();
+        requestAnimationFrame(() => {this.tick()});
     }
 
     setFragmentColor(): void {
@@ -115,7 +155,7 @@ export class ModelViewerComponent implements OnInit {
             console.log('Failed to get the storage location of a_Position');
             return -1;
         }
-        this.gl.vertexAttribPointer(a_Position, 2, this.gl.FLOAT, false, 0, 0);
+        this.gl.vertexAttribPointer(a_Position, 3, this.gl.FLOAT, false, 0, 0);
         this.gl.enableVertexAttribArray(a_Position);
 
         return 0;

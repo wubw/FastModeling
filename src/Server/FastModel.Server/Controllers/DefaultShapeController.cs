@@ -18,12 +18,59 @@ namespace FastModel.Server.Controllers
             if (type == "plane")
             {
                 var face = new Face();
-                face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, });
-                face.Vertices.Add(new Point() { X = -0.5, Y = -0.5, });
-                face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, });
-                face.Vertices.Add(new Point() { X = 0.5, Y = 0.5, });
-                face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, });
-                face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, });
+                face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = -0.5 });
+                face.Vertices.Add(new Point() { X = -0.5, Y = -0.5, Z = -0.5 });
+                face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, Z = -0.5 });
+                face.Vertices.Add(new Point() { X = 0.5, Y = 0.5, Z = -0.5 });
+                face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, Z = -0.5 });
+                face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = -0.5 });
+
+                return JsonConvert.SerializeObject(face);
+            }
+            if (type == "cube")
+            {
+                var face = new Face();
+                face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = -0.5 });
+                face.Vertices.Add(new Point() { X = -0.5, Y = -0.5, Z = -0.5 });
+                face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, Z = -0.5 });
+                face.Vertices.Add(new Point() { X = 0.5, Y = 0.5, Z = -0.5 });
+                face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, Z = -0.5 });
+                face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = -0.5 });
+
+                face.Vertices.Add(new Point() { X = 0.5, Y = 0.5, Z = -0.5, });
+                face.Vertices.Add(new Point() { X = 0.5, Y = 0.5, Z = 0.5, });
+                face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, Z = -0.5, });
+                face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, Z = -0.5, });
+                face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, Z = 0.5, });
+                face.Vertices.Add(new Point() { X = 0.5, Y = 0.5, Z = 0.5, });
+
+                face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = -0.5, });
+                face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = 0.5, });
+                face.Vertices.Add(new Point() { X = -0.5, Y = -0.5, Z = -0.5, });
+                face.Vertices.Add(new Point() { X = -0.5, Y = -0.5, Z = -0.5, });
+                face.Vertices.Add(new Point() { X = -0.5, Y = -0.5, Z = 0.5, });
+                face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = 0.5, });
+
+                face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = 0.5 });
+                face.Vertices.Add(new Point() { X = -0.5, Y = -0.5, Z = 0.5 });
+                face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, Z = 0.5 });
+                face.Vertices.Add(new Point() { X = 0.5, Y = 0.5, Z = 0.5 });
+                face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, Z = 0.5 });
+                face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = 0.5 });
+
+                face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = -0.5 });
+                face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = 0.5 });
+                face.Vertices.Add(new Point() { X = 0.5, Y = 0.5, Z = -0.5 });
+                face.Vertices.Add(new Point() { X = 0.5, Y = 0.5, Z = -0.5 });
+                face.Vertices.Add(new Point() { X = 0.5, Y = 0.5, Z = 0.5 });
+                face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = 0.5 });
+
+                face.Vertices.Add(new Point() { X = -0.5, Y = -0.5, Z = -0.5 });
+                face.Vertices.Add(new Point() { X = -0.5, Y = -0.5, Z = 0.5 });
+                face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, Z = -0.5 });
+                face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, Z = -0.5 });
+                face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, Z = 0.5 });
+                face.Vertices.Add(new Point() { X = -0.5, Y = -0.5, Z = 0.5 });
 
                 return JsonConvert.SerializeObject(face);
             }

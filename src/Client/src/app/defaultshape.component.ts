@@ -20,7 +20,20 @@ export class DefaultshapeComponent {
 
     createPlane(): void {
         this.title = 'create plane';
-        var urlwithquery = this.webapiUrl + '?type=' + 'plane';
+        this.createModel(this.webapiUrl + '?type=' + 'plane');
+    }
+
+    createCube(): void {
+        this.title = 'create cube';
+        this.createModel(this.webapiUrl + '?type=' + 'cube');
+    }
+
+    createSphere(): void {
+        this.title = 'create sphere';
+        this.createModel(this.webapiUrl + '?type=' + 'sphere');
+    }
+
+    createModel(urlwithquery: string): void {
         var getplane = this.http.get(urlwithquery)
              .toPromise()
              .then(r => r.text());
@@ -30,13 +43,5 @@ export class DefaultshapeComponent {
                 this.retrieveModelService.setModel(d);
             }
         });
-    }
-
-    createCube(): void {
-        this.title = 'create cube';
-    }
-
-    createSphere(): void {
-        this.title = 'create sphere';
     }
 }
