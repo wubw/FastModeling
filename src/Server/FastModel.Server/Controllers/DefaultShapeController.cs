@@ -56,13 +56,12 @@ namespace FastModel.Server.Controllers
                 face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, Z = -0.5, });
                 face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, Z = 0.5, });
                 face.Vertices.Add(new Point() { X = 0.5, Y = 0.5, Z = 0.5, });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = 1.0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = 1.0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = 1.0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = 1.0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = 1.0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = 1.0 });
-
+                face.Normals.Add(new Vector() { X = 1, Y = 0, Z = 0 });
+                face.Normals.Add(new Vector() { X = 1, Y = 0, Z = 0 });
+                face.Normals.Add(new Vector() { X = 1, Y = 0, Z = 0 });
+                face.Normals.Add(new Vector() { X = 1, Y = 0, Z = 0 });
+                face.Normals.Add(new Vector() { X = 1, Y = 0, Z = 0 });
+                face.Normals.Add(new Vector() { X = 1, Y = 0, Z = 0 });
 
                 face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = -0.5, });
                 face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = 0.5, });
@@ -70,12 +69,12 @@ namespace FastModel.Server.Controllers
                 face.Vertices.Add(new Point() { X = -0.5, Y = -0.5, Z = -0.5, });
                 face.Vertices.Add(new Point() { X = -0.5, Y = -0.5, Z = 0.5, });
                 face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = 0.5, });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = 1.0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = 1.0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = 1.0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = 1.0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = 1.0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = 1.0 });
+                face.Normals.Add(new Vector() { X = -1, Y = 0, Z = 0 });
+                face.Normals.Add(new Vector() { X = -1, Y = 0, Z = 0 });
+                face.Normals.Add(new Vector() { X = -1, Y = 0, Z = 0 });
+                face.Normals.Add(new Vector() { X = -1, Y = 0, Z = 0 });
+                face.Normals.Add(new Vector() { X = -1, Y = 0, Z = 0 });
+                face.Normals.Add(new Vector() { X = -1, Y = 0, Z = 0 });
 
                 face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = 0.5 });
                 face.Vertices.Add(new Point() { X = -0.5, Y = -0.5, Z = 0.5 });
@@ -83,12 +82,12 @@ namespace FastModel.Server.Controllers
                 face.Vertices.Add(new Point() { X = 0.5, Y = 0.5, Z = 0.5 });
                 face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, Z = 0.5 });
                 face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = 0.5 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = 1.0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = 1.0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = 1.0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = 1.0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = 1.0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = 1.0 });
+                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = -1.0 });
+                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = -1.0 });
+                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = -1.0 });
+                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = -1.0 });
+                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = -1.0 });
+                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = -1.0 });
 
                 face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = -0.5 });
                 face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = 0.5 });
@@ -109,12 +108,12 @@ namespace FastModel.Server.Controllers
                 face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, Z = -0.5 });
                 face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, Z = 0.5 });
                 face.Vertices.Add(new Point() { X = -0.5, Y = -0.5, Z = 0.5 });
-                face.Normals.Add(new Vector() { X = 0, Y = 1, Z = 0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 1, Z = 0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 1, Z = 0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 1, Z = 0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 1, Z = 0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 1, Z = 0 });
+                face.Normals.Add(new Vector() { X = 0, Y = -1, Z = 0 });
+                face.Normals.Add(new Vector() { X = 0, Y = -1, Z = 0 });
+                face.Normals.Add(new Vector() { X = 0, Y = -1, Z = 0 });
+                face.Normals.Add(new Vector() { X = 0, Y = -1, Z = 0 });
+                face.Normals.Add(new Vector() { X = 0, Y = -1, Z = 0 });
+                face.Normals.Add(new Vector() { X = 0, Y = -1, Z = 0 });
 
                 return JsonConvert.SerializeObject(face);
             }

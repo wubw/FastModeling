@@ -155,7 +155,7 @@ export class ModelViewerComponent implements OnInit {
         var u_LightDirection = this.gl.getUniformLocation(this.program, 'u_LightDirection');
         this.gl.uniform3f(u_LightColor, 1.0, 1.0, 1.0);
         var cm = require("./common/coun-matrix");
-        var lightDirection = new cm.Vector3([0.5, 3.0, 4.0]);
+        var lightDirection = new cm.Vector3([5, 3.0, 4.0]);
         lightDirection.normalize();
         this.gl.uniform3fv(u_LightDirection, lightDirection.elements);
     }
