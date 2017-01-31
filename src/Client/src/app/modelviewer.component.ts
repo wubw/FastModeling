@@ -125,7 +125,8 @@ export class ModelViewerComponent implements OnInit {
 
     draw(): void {
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+        this.gl.enable(this.gl.DEPTH_TEST);
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
         if(!this.n || this.n <= 0) {
             return;
         }
@@ -136,8 +137,8 @@ export class ModelViewerComponent implements OnInit {
             return;
         }
 
-        this.modelMatrix.rotate(this.currentAngle[0], 1.0, 0.0, 0.0);
-        this.modelMatrix.rotate(this.currentAngle[1], 0.0, 1.0, 0.0);
+        this.modelMatrix.rotate(-1 * this.currentAngle[0], 1.0, 0.0, 0.0);
+        this.modelMatrix.rotate(-1 * this.currentAngle[1], 0.0, 1.0, 0.0);
         this.currentAngle = [0.0, 0.0];
         this.gl.uniformMatrix4fv(this.u_ModelMatrix, false, this.modelMatrix.elements);
         console.log('draw');
