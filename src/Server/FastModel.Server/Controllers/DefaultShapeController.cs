@@ -1,12 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Net;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
-using System.Web.Http;
+﻿using System.Web.Http;
 using System.Web.Http.Cors;
 using FastModel.Server.Models;
 using Newtonsoft.Json;
-using Swashbuckle.Swagger.Annotations;
 
 namespace FastModel.Server.Controllers
 {
@@ -16,109 +11,69 @@ namespace FastModel.Server.Controllers
     {
         public string Get(string type)
         {
+            var model = new Model();
             if (type == "plane")
             {
                 var face = new Face();
-                face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = -0.5 });
                 face.Vertices.Add(new Point() { X = -0.5, Y = -0.5, Z = -0.5 });
+                face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = -0.5 });
                 face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, Z = -0.5 });
                 face.Vertices.Add(new Point() { X = 0.5, Y = 0.5, Z = -0.5 });
-                face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, Z = -0.5 });
-                face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = -0.5 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = 1.0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = 1.0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = 1.0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = 1.0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = 1.0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = 1.0 });
-
-                return JsonConvert.SerializeObject(face);
+                face.Normal = new Vector() { X = 0, Y = 0, Z = 1.0 };
+                model.Faces.Add(face);
             }
             if (type == "cube")
             {
                 var face = new Face();
-                face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = -0.5 });
                 face.Vertices.Add(new Point() { X = -0.5, Y = -0.5, Z = -0.5 });
+                face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = -0.5 });
                 face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, Z = -0.5 });
                 face.Vertices.Add(new Point() { X = 0.5, Y = 0.5, Z = -0.5 });
-                face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, Z = -0.5 });
-                face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = -0.5 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = 1.0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = 1.0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = 1.0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = 1.0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = 1.0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = 1.0 });
+                face.Normal = new Vector() { X = 0, Y = 0, Z = 1.0 };
+                model.Faces.Add(face);
 
+                face = new Face();
+                face.Vertices.Add(new Point() { X = -0.5, Y = -0.5, Z = 0.5 });
+                face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = 0.5 });
+                face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, Z = 0.5 });
+                face.Vertices.Add(new Point() { X = 0.5, Y = 0.5, Z = 0.5 });
+                face.Normal = new Vector() { X = 0, Y = 0, Z = -1.0 };
+                model.Faces.Add(face);
+
+                face = new Face();
                 face.Vertices.Add(new Point() { X = 0.5, Y = 0.5, Z = -0.5, });
                 face.Vertices.Add(new Point() { X = 0.5, Y = 0.5, Z = 0.5, });
                 face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, Z = -0.5, });
-                face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, Z = -0.5, });
                 face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, Z = 0.5, });
-                face.Vertices.Add(new Point() { X = 0.5, Y = 0.5, Z = 0.5, });
-                face.Normals.Add(new Vector() { X = 1, Y = 0, Z = 0 });
-                face.Normals.Add(new Vector() { X = 1, Y = 0, Z = 0 });
-                face.Normals.Add(new Vector() { X = 1, Y = 0, Z = 0 });
-                face.Normals.Add(new Vector() { X = 1, Y = 0, Z = 0 });
-                face.Normals.Add(new Vector() { X = 1, Y = 0, Z = 0 });
-                face.Normals.Add(new Vector() { X = 1, Y = 0, Z = 0 });
+                face.Normal = new Vector() { X = 1, Y = 0, Z = 0 };
+                model.Faces.Add(face);
 
+                face = new Face();
                 face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = -0.5, });
                 face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = 0.5, });
                 face.Vertices.Add(new Point() { X = -0.5, Y = -0.5, Z = -0.5, });
-                face.Vertices.Add(new Point() { X = -0.5, Y = -0.5, Z = -0.5, });
                 face.Vertices.Add(new Point() { X = -0.5, Y = -0.5, Z = 0.5, });
-                face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = 0.5, });
-                face.Normals.Add(new Vector() { X = -1, Y = 0, Z = 0 });
-                face.Normals.Add(new Vector() { X = -1, Y = 0, Z = 0 });
-                face.Normals.Add(new Vector() { X = -1, Y = 0, Z = 0 });
-                face.Normals.Add(new Vector() { X = -1, Y = 0, Z = 0 });
-                face.Normals.Add(new Vector() { X = -1, Y = 0, Z = 0 });
-                face.Normals.Add(new Vector() { X = -1, Y = 0, Z = 0 });
+                face.Normal = new Vector() { X = -1, Y = 0, Z = 0 };
+                model.Faces.Add(face);
 
-                face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = 0.5 });
-                face.Vertices.Add(new Point() { X = -0.5, Y = -0.5, Z = 0.5 });
-                face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, Z = 0.5 });
-                face.Vertices.Add(new Point() { X = 0.5, Y = 0.5, Z = 0.5 });
-                face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, Z = 0.5 });
-                face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = 0.5 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = -1.0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = -1.0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = -1.0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = -1.0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = -1.0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 0, Z = -1.0 });
-
+                face = new Face();
                 face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = -0.5 });
                 face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = 0.5 });
                 face.Vertices.Add(new Point() { X = 0.5, Y = 0.5, Z = -0.5 });
-                face.Vertices.Add(new Point() { X = 0.5, Y = 0.5, Z = -0.5 });
                 face.Vertices.Add(new Point() { X = 0.5, Y = 0.5, Z = 0.5 });
-                face.Vertices.Add(new Point() { X = -0.5, Y = 0.5, Z = 0.5 });
-                face.Normals.Add(new Vector() { X = 0, Y = 1, Z = 0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 1, Z = 0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 1, Z = 0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 1, Z = 0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 1, Z = 0 });
-                face.Normals.Add(new Vector() { X = 0, Y = 1, Z = 0 });
+                face.Normal = new Vector() { X = 0, Y = 1, Z = 0 };
+                model.Faces.Add(face);
 
+                face = new Face();
                 face.Vertices.Add(new Point() { X = -0.5, Y = -0.5, Z = -0.5 });
                 face.Vertices.Add(new Point() { X = -0.5, Y = -0.5, Z = 0.5 });
                 face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, Z = -0.5 });
-                face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, Z = -0.5 });
                 face.Vertices.Add(new Point() { X = 0.5, Y = -0.5, Z = 0.5 });
-                face.Vertices.Add(new Point() { X = -0.5, Y = -0.5, Z = 0.5 });
-                face.Normals.Add(new Vector() { X = 0, Y = -1, Z = 0 });
-                face.Normals.Add(new Vector() { X = 0, Y = -1, Z = 0 });
-                face.Normals.Add(new Vector() { X = 0, Y = -1, Z = 0 });
-                face.Normals.Add(new Vector() { X = 0, Y = -1, Z = 0 });
-                face.Normals.Add(new Vector() { X = 0, Y = -1, Z = 0 });
-                face.Normals.Add(new Vector() { X = 0, Y = -1, Z = 0 });
-
-                return JsonConvert.SerializeObject(face);
+                face.Normal = new Vector() { X = 0, Y = -1, Z = 0 };
+                model.Faces.Add(face);
             }
 
-            return string.Empty;
+            return JsonConvert.SerializeObject(model);
         }
 
         // POST api/values

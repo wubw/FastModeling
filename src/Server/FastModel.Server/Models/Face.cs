@@ -19,10 +19,19 @@ namespace FastModel.Server.Models
         public Face()
         {
             this.Vertices = new List<Point>();
-            this.Normals = new List<Point>();
         }
 
         public IList<Point> Vertices { get; private set; }    
-        public IList<Point> Normals { get; private set; }
+        public Vector Normal { get; set; }
+    }
+
+    public class Model
+    {
+        public Model()
+        {
+            this.Faces = new List<Face>();
+        }
+
+        public IList<Face> Faces { get; private set; }
     }
 }

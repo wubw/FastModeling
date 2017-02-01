@@ -3,6 +3,7 @@
 import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { Http, Response, Headers } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
+import { Face } from './model';
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';      
@@ -26,9 +27,7 @@ export class ModelViewerComponent implements OnInit {
     dragging: boolean;
     lastX: number;
     lastY: number;
-    vertices: Float32Array;
-    normals: Float32Array;
-    n: number;
+    faces: Face[] = [];
 
     constructor(private retrieveModelService: RetrieveModelService) {
         var cm = require("./common/coun-matrix");
@@ -101,23 +100,28 @@ export class ModelViewerComponent implements OnInit {
     drawRetrievedModel(m) : void {
         console.log('model retrieved %s', m);
         var d = JSON.parse(m);
-        this.n = d.Vertices.length;
-        this.vertices = new Float32Array(this.n * 3);
-        var i = 0;
-        for(let v of d.Vertices) {
-            this.vertices[i] = v.X;
-            this.vertices[i+1] = v.Y;
-            this.vertices[i+2] = v.Z;
-            i = i + 3;
+        for(let f of d.Faces) {
+            var vertices = new Float32Array(f.Vertices.length * 3);
+            var i = 0;
+            for(let v of f.Vertices) {
+                vertices[i] = v.X;
+                vertices[i+1] = v.Y;
+                vertices[i+2] = v.Z;
+                i = i + 3;
+            }
+            var normals = new Float32Array(f.Vertices.length * 3);
+            for(var j = 0; j < normals.length; j = j + 3) {
+                normals[j] = f.Normal.X;
+                normals[j+1] = f.Normal.Y;
+                normals[j+2] = f.Normal.Z;
+            }
+            var face = new Face();
+            face.n = f.Vertices.length;
+            face.vertices = vertices;
+            face.normals = normals;
+            this.faces.push(face);
         }
-        this.normals = new Float32Array(this.n * 3);
-        i = 0;
-        for(let n of d.Normals) {
-            this.normals[i] = n.X;
-            this.normals[i+1] = n.Y;
-            this.normals[i+2] = n.Z;
-            i = i + 3;
-        }
+        
         var a_Color = this.gl.getUniformLocation(this.program, 'a_Color');
         this.gl.uniform4f(a_Color, 1.0, 0.0, 0.0, 1.0);
         this.draw();
@@ -127,22 +131,25 @@ export class ModelViewerComponent implements OnInit {
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
         this.gl.enable(this.gl.DEPTH_TEST);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-        if(!this.n || this.n <= 0) {
-            return;
-        }
-        if(!this.initArrayBuffer(this.vertices, 3, this.gl.FLOAT, 'a_Position')) {
-            return;
-        }
-        if(!this.initArrayBuffer(this.normals, 3, this.gl.FLOAT, 'a_Normal')) {
-            return;
-        }
-
+        
         this.modelMatrix.rotate(-1 * this.currentAngle[0], 1.0, 0.0, 0.0);
         this.modelMatrix.rotate(-1 * this.currentAngle[1], 0.0, 1.0, 0.0);
         this.currentAngle = [0.0, 0.0];
         this.gl.uniformMatrix4fv(this.u_ModelMatrix, false, this.modelMatrix.elements);
         console.log('draw');
-        this.gl.drawArrays(this.gl.TRIANGLES, 0, this.n);
+
+        for(let f of this.faces) {
+            if(!f.n || f.n <= 0) {
+                return;
+            }
+            if(!this.initArrayBuffer(f.vertices, 3, this.gl.FLOAT, 'a_Position')) {
+                return;
+            }
+            if(!this.initArrayBuffer(f.normals, 3, this.gl.FLOAT, 'a_Normal')) {
+                return;
+            }
+            this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, f.n);
+        }
     }
 
     tick() {
