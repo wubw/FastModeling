@@ -99,6 +99,7 @@ export class ModelViewerComponent implements OnInit {
 
     drawRetrievedModel(m) : void {
         console.log('model retrieved %s', m);
+        this.faces = [];
         var d = JSON.parse(m);
         for(let f of d.Faces) {
             var vertices = new Float32Array(f.Vertices.length * 3);
@@ -168,7 +169,6 @@ export class ModelViewerComponent implements OnInit {
     }
 
     initArrayBuffer(data, num: number, type, attribute:string): boolean {
-        console.log('data,' + attribute + ': ' + data);
         var buffer = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
         this.gl.bufferData(this.gl.ARRAY_BUFFER, data, this.gl.STATIC_DRAW);

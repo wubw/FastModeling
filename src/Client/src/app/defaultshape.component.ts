@@ -34,10 +34,10 @@ export class DefaultshapeComponent {
     }
 
     createModel(urlwithquery: string): void {
-        var getplane = this.http.get(urlwithquery)
+        var modelPromise = this.http.get(urlwithquery)
              .toPromise()
              .then(r => r.text());
-        getplane.then(p => {
+        modelPromise.then(p => {
             if(p) {
                 var d = JSON.parse(p);
                 this.retrieveModelService.setModel(d);
