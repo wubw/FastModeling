@@ -88,48 +88,84 @@ namespace FastModel.Server.Controllers
             face.Vertices.Add(new Point {X = -0.5, Y = -0.5, Z = -0.5});
             face.Vertices.Add(new Point {X = -0.5, Y = 0.5, Z = -0.5});
             face.Vertices.Add(new Point {X = 0.5, Y = -0.5, Z = -0.5});
-            face.Vertices.Add(new Point {X = 0.5, Y = 0.5, Z = -0.5});
             face.Normal = new Vector {X = 0, Y = 0, Z = 1.0};
+            model.Faces.Add(face);
+
+            face = new Face();
+            face.Vertices.Add(new Point { X = -0.5, Y = 0.5, Z = -0.5 });
+            face.Vertices.Add(new Point { X = 0.5, Y = -0.5, Z = -0.5 });
+            face.Vertices.Add(new Point { X = 0.5, Y = 0.5, Z = -0.5 });
+            face.Normal = new Vector { X = 0, Y = 0, Z = 1.0 };
             model.Faces.Add(face);
 
             face = new Face();
             face.Vertices.Add(new Point {X = -0.5, Y = -0.5, Z = 0.5});
             face.Vertices.Add(new Point {X = -0.5, Y = 0.5, Z = 0.5});
             face.Vertices.Add(new Point {X = 0.5, Y = -0.5, Z = 0.5});
-            face.Vertices.Add(new Point {X = 0.5, Y = 0.5, Z = 0.5});
             face.Normal = new Vector {X = 0, Y = 0, Z = -1.0};
+            model.Faces.Add(face);
+
+            face = new Face();
+            face.Vertices.Add(new Point { X = -0.5, Y = 0.5, Z = 0.5 });
+            face.Vertices.Add(new Point { X = 0.5, Y = -0.5, Z = 0.5 });
+            face.Vertices.Add(new Point { X = 0.5, Y = 0.5, Z = 0.5 });
+            face.Normal = new Vector { X = 0, Y = 0, Z = -1.0 };
             model.Faces.Add(face);
 
             face = new Face();
             face.Vertices.Add(new Point {X = 0.5, Y = 0.5, Z = -0.5,});
             face.Vertices.Add(new Point {X = 0.5, Y = 0.5, Z = 0.5,});
             face.Vertices.Add(new Point {X = 0.5, Y = -0.5, Z = -0.5,});
-            face.Vertices.Add(new Point {X = 0.5, Y = -0.5, Z = 0.5,});
             face.Normal = new Vector {X = 1, Y = 0, Z = 0};
+            model.Faces.Add(face);
+
+            face = new Face();
+            face.Vertices.Add(new Point { X = 0.5, Y = 0.5, Z = 0.5, });
+            face.Vertices.Add(new Point { X = 0.5, Y = -0.5, Z = -0.5, });
+            face.Vertices.Add(new Point { X = 0.5, Y = -0.5, Z = 0.5, });
+            face.Normal = new Vector { X = 1, Y = 0, Z = 0 };
             model.Faces.Add(face);
 
             face = new Face();
             face.Vertices.Add(new Point {X = -0.5, Y = 0.5, Z = -0.5,});
             face.Vertices.Add(new Point {X = -0.5, Y = 0.5, Z = 0.5,});
             face.Vertices.Add(new Point {X = -0.5, Y = -0.5, Z = -0.5,});
-            face.Vertices.Add(new Point {X = -0.5, Y = -0.5, Z = 0.5,});
             face.Normal = new Vector {X = -1, Y = 0, Z = 0};
+            model.Faces.Add(face);
+
+            face = new Face();
+            face.Vertices.Add(new Point { X = -0.5, Y = 0.5, Z = 0.5, });
+            face.Vertices.Add(new Point { X = -0.5, Y = -0.5, Z = -0.5, });
+            face.Vertices.Add(new Point { X = -0.5, Y = -0.5, Z = 0.5, });
+            face.Normal = new Vector { X = -1, Y = 0, Z = 0 };
             model.Faces.Add(face);
 
             face = new Face();
             face.Vertices.Add(new Point {X = -0.5, Y = 0.5, Z = -0.5});
             face.Vertices.Add(new Point {X = -0.5, Y = 0.5, Z = 0.5});
             face.Vertices.Add(new Point {X = 0.5, Y = 0.5, Z = -0.5});
-            face.Vertices.Add(new Point {X = 0.5, Y = 0.5, Z = 0.5});
             face.Normal = new Vector {X = 0, Y = 1, Z = 0};
+            model.Faces.Add(face);
+
+            face = new Face();
+            face.Vertices.Add(new Point { X = -0.5, Y = 0.5, Z = 0.5 });
+            face.Vertices.Add(new Point { X = 0.5, Y = 0.5, Z = -0.5 });
+            face.Vertices.Add(new Point { X = 0.5, Y = 0.5, Z = 0.5 });
+            face.Normal = new Vector { X = 0, Y = 1, Z = 0 };
             model.Faces.Add(face);
 
             face = new Face();
             face.Vertices.Add(new Point {X = -0.5, Y = -0.5, Z = -0.5});
             face.Vertices.Add(new Point {X = -0.5, Y = -0.5, Z = 0.5});
             face.Vertices.Add(new Point {X = 0.5, Y = -0.5, Z = -0.5});
-            face.Vertices.Add(new Point {X = 0.5, Y = -0.5, Z = 0.5});
             face.Normal = new Vector {X = 0, Y = -1, Z = 0};
+            model.Faces.Add(face);
+
+            face = new Face();
+            face.Vertices.Add(new Point { X = -0.5, Y = -0.5, Z = 0.5 });
+            face.Vertices.Add(new Point { X = 0.5, Y = -0.5, Z = -0.5 });
+            face.Vertices.Add(new Point { X = 0.5, Y = -0.5, Z = 0.5 });
+            face.Normal = new Vector { X = 0, Y = -1, Z = 0 };
             model.Faces.Add(face);
         }
 
@@ -139,8 +175,14 @@ namespace FastModel.Server.Controllers
             face.Vertices.Add(new Point {X = -0.5, Y = -0.5, Z = -0.5});
             face.Vertices.Add(new Point {X = -0.5, Y = 0.5, Z = -0.5});
             face.Vertices.Add(new Point {X = 0.5, Y = -0.5, Z = -0.5});
-            face.Vertices.Add(new Point {X = 0.5, Y = 0.5, Z = -0.5});
             face.Normal = new Vector {X = 0, Y = 0, Z = 1.0};
+            model.Faces.Add(face);
+
+            face = new Face();
+            face.Vertices.Add(new Point { X = -0.5, Y = 0.5, Z = -0.5 });
+            face.Vertices.Add(new Point { X = 0.5, Y = -0.5, Z = -0.5 });
+            face.Vertices.Add(new Point { X = 0.5, Y = 0.5, Z = -0.5 });
+            face.Normal = new Vector { X = 0, Y = 0, Z = 1.0 };
             model.Faces.Add(face);
         }
 

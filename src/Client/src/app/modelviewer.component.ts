@@ -27,7 +27,8 @@ export class ModelViewerComponent implements OnInit {
     dragging: boolean;
     lastX: number;
     lastY: number;
-    faces: Face[] = [];
+    surface: Face = new Face();
+    needDraw: boolean = true;
 
     constructor(private retrieveModelService: RetrieveModelService) {
         var cm = require("./common/coun-matrix");
@@ -60,7 +61,7 @@ export class ModelViewerComponent implements OnInit {
         this.u_ModelMatrix = this.gl.getUniformLocation(this.program, 'u_xformMatrix');
         
         this.setLight();
-
+        
         this.tick();
     }
 
@@ -91,6 +92,7 @@ export class ModelViewerComponent implements OnInit {
                 var dy = factor * (y - this.lastY);
                 this.currentAngle[0] = Math.max(Math.min(this.currentAngle[0] + dy, 90.0), -90.0);
                 this.currentAngle[1] = this.currentAngle[1] + dx;
+                this.needDraw = true;
             }
             this.lastX = x;
             this.lastY = y;
@@ -99,36 +101,46 @@ export class ModelViewerComponent implements OnInit {
 
     drawRetrievedModel(m) : void {
         console.log('model retrieved %s', m);
-        this.faces = [];
         var d = JSON.parse(m);
+        var surfaceVertices:number[] = [];
+        var surfaceNormals:number[] = [];
+        var n:number = 0;
         for(let f of d.Faces) {
-            var vertices = new Float32Array(f.Vertices.length * 3);
-            var i = 0;
             for(let v of f.Vertices) {
-                vertices[i] = v.X;
-                vertices[i+1] = v.Y;
-                vertices[i+2] = v.Z;
                 i = i + 3;
+                surfaceVertices.push(v.X);
+                surfaceVertices.push(v.Y);
+                surfaceVertices.push(v.Z);
+                n = n + 1;
             }
-            var normals = new Float32Array(f.Vertices.length * 3);
-            for(var j = 0; j < normals.length; j = j + 3) {
-                normals[j] = f.Normal.X;
-                normals[j+1] = f.Normal.Y;
-                normals[j+2] = f.Normal.Z;
+            for(var j = 0; j < f.Vertices.length * 3; j = j + 3) {
+                surfaceNormals.push(f.Normal.X);
+                surfaceNormals.push(f.Normal.Y);
+                surfaceNormals.push(f.Normal.Z);
             }
-            var face = new Face();
-            face.n = f.Vertices.length;
-            face.vertices = vertices;
-            face.normals = normals;
-            this.faces.push(face);
+        }
+
+        this.surface.n = n;
+        this.surface.vertices = new Float32Array(n * 3);
+        this.surface.normals = new Float32Array(n * 3);
+        for(var i = 0; i < surfaceVertices.length; i++) {
+            this.surface.vertices[i] = surfaceVertices[i];
+        }
+        for(var i = 0; i < surfaceNormals.length; i++) {
+            this.surface.normals[i] = surfaceNormals[i];
         }
         
         var a_Color = this.gl.getUniformLocation(this.program, 'a_Color');
         this.gl.uniform4f(a_Color, 1.0, 0.0, 0.0, 1.0);
+        this.needDraw = true;
         this.draw();
     }
 
     draw(): void {
+        if(!this.needDraw) {
+            return;
+        }
+        
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
         this.gl.enable(this.gl.DEPTH_TEST);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
@@ -139,18 +151,13 @@ export class ModelViewerComponent implements OnInit {
         this.gl.uniformMatrix4fv(this.u_ModelMatrix, false, this.modelMatrix.elements);
         console.log('draw');
 
-        for(let f of this.faces) {
-            if(!f.n || f.n <= 0) {
-                return;
-            }
-            if(!this.initArrayBuffer(f.vertices, 3, this.gl.FLOAT, 'a_Position')) {
-                return;
-            }
-            if(!this.initArrayBuffer(f.normals, 3, this.gl.FLOAT, 'a_Normal')) {
-                return;
-            }
-            this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, f.n);
+        if(this.surface.n > 0) {
+            this.initArrayBuffer(this.surface.vertices, 3, this.gl.FLOAT, 'a_Position');
+            this.initArrayBuffer(this.surface.normals, 3, this.gl.FLOAT, 'a_Normal');
+            this.gl.drawArrays(this.gl.TRIANGLES, 0, this.surface.n);
         }
+
+        this.needDraw = false;
     }
 
     tick() {
