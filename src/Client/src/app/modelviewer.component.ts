@@ -173,6 +173,8 @@ export class ModelViewerComponent implements OnInit {
         var lightDirection = new cm.Vector3([5, 3.0, 4.0]);
         lightDirection.normalize();
         this.gl.uniform3fv(u_LightDirection, lightDirection.elements);
+        var u_AmbientLight = this.gl.getUniformLocation(this.program, 'u_AmbientLight');
+        this.gl.uniform3f(u_AmbientLight, 0.2, 0.2, 0.2);
     }
 
     initArrayBuffer(data, num: number, type, attribute:string): boolean {
