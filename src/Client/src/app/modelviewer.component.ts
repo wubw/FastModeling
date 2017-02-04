@@ -74,9 +74,11 @@ export class ModelViewerComponent implements OnInit {
             var x = ev.clientX, y = ev.clientY;
             var rect = ev.target.getBoundingClientRect();
             if(rect.left <= x && x < rect.right && rect.top <= y && y < rect.bottom) {
-                this.lastX = x;
-                this.lastY = y;
-                this.dragging = true;
+                if(ev.ctrlKey || ev.shiftKey) {
+                    this.lastX = x;
+                    this.lastY = y;
+                    this.dragging = true;
+                }
             }
         }
 
@@ -87,15 +89,42 @@ export class ModelViewerComponent implements OnInit {
         canvas.onmousemove = ev => {
             var x = ev.clientX, y = ev.clientY;
             if(this.dragging) {
-                var factor = 100/canvas.height;
-                var dx = factor * (x - this.lastX);
-                var dy = factor * (y - this.lastY);
-                this.currentAngle[0] = Math.max(Math.min(this.currentAngle[0] + dy, 90.0), -90.0);
-                this.currentAngle[1] = this.currentAngle[1] + dx;
-                this.needDraw = true;
+                if(ev.ctrlKey) {
+                    var factor = 100/canvas.height;
+                    var dx = factor * (x - this.lastX);
+                    var dy = factor * (y - this.lastY);
+                    this.currentAngle[0] = Math.max(Math.min(this.currentAngle[0] + dy, 90.0), -90.0);
+                    this.currentAngle[1] = this.currentAngle[1] + dx;
+                    this.lastX = x;
+                    this.lastY = y;
+
+                    this.modelMatrix.rotate(-1 * this.currentAngle[0], 1.0, 0.0, 0.0);
+                    this.modelMatrix.rotate(-1 * this.currentAngle[1], 0.0, 1.0, 0.0);
+                    this.currentAngle = [0.0, 0.0];
+
+                    this.needDraw = true;
+                } else if(ev.shiftKey) {
+                    var dx = (x - this.lastX)/canvas.height;
+                    var dy = (y - this.lastY)/canvas.height;
+                    this.lastX = x;
+                    this.lastY = y;
+                    this.modelMatrix.translate(dx, -1*dy, 0);
+                    this.needDraw = true;
+                } else {
+                    this.needDraw = false;
+                }
             }
-            this.lastX = x;
-            this.lastY = y;
+        }
+
+        canvas.onmousewheel = ev => {
+            var scaledown = 0.9;
+            var scaleup = 1.1;
+            if (ev.wheelDelta < 0) {
+                this.modelMatrix.scale(scaledown, scaledown, scaledown);
+            } else if (ev.wheelDelta > 0) {
+                this.modelMatrix.scale(scaleup, scaleup, scaleup);
+            }
+            this.needDraw = true;
         }
     }
 
@@ -144,14 +173,9 @@ export class ModelViewerComponent implements OnInit {
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
         this.gl.enable(this.gl.DEPTH_TEST);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-        
-        this.modelMatrix.rotate(-1 * this.currentAngle[0], 1.0, 0.0, 0.0);
-        this.modelMatrix.rotate(-1 * this.currentAngle[1], 0.0, 1.0, 0.0);
-        this.currentAngle = [0.0, 0.0];
-        this.gl.uniformMatrix4fv(this.u_ModelMatrix, false, this.modelMatrix.elements);
-        console.log('draw');
 
         if(this.surface.n > 0) {
+            this.gl.uniformMatrix4fv(this.u_ModelMatrix, false, this.modelMatrix.elements);
             this.initArrayBuffer(this.surface.vertices, 3, this.gl.FLOAT, 'a_Position');
             this.initArrayBuffer(this.surface.normals, 3, this.gl.FLOAT, 'a_Normal');
             this.gl.drawArrays(this.gl.TRIANGLES, 0, this.surface.n);
