@@ -28,6 +28,7 @@ export class ModelViewerComponent implements OnInit {
     lastX: number;
     lastY: number;
     surface: Face = new Face();
+    selected: boolean;
     needDraw: boolean = true;
 
     constructor(private retrieveModelService: RetrieveModelService) {
@@ -78,6 +79,8 @@ export class ModelViewerComponent implements OnInit {
                     this.lastX = x;
                     this.lastY = y;
                     this.dragging = true;
+                } else {
+                    this.checkSelection(x-rect.left, rect.bottom-y);
                 }
             }
         }
@@ -159,8 +162,7 @@ export class ModelViewerComponent implements OnInit {
             this.surface.normals[i] = surfaceNormals[i];
         }
         
-        var a_Color = this.gl.getUniformLocation(this.program, 'a_Color');
-        this.gl.uniform4f(a_Color, 1.0, 0.0, 0.0, 1.0);
+        this.resetState();
         this.needDraw = true;
         this.draw();
     }
@@ -173,6 +175,13 @@ export class ModelViewerComponent implements OnInit {
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
         this.gl.enable(this.gl.DEPTH_TEST);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+
+        var a_Color = this.gl.getUniformLocation(this.program, 'a_Color');
+        if (this.selected) {
+            this.gl.uniform4f(a_Color, 1.0, 1.0, 0.0, 1.0);
+        } else {
+            this.gl.uniform4f(a_Color, 1.0, 0.0, 0.0, 1.0);
+        }
 
         if(this.surface.n > 0) {
             this.gl.uniformMatrix4fv(this.u_ModelMatrix, false, this.modelMatrix.elements);
@@ -211,4 +220,21 @@ export class ModelViewerComponent implements OnInit {
         
         return true;
     } 
+
+    checkSelection(x: number, y: number) {
+        this.needDraw = true;
+        this.draw();
+        var pixels = new Uint8Array(4);
+        this.gl.readPixels(x, y, 1, 1, this.gl.RGBA, this.gl.UNSIGNED_BYTE, pixels);
+        if (pixels[0] != 0 || pixels[1] != 0 || pixels[2] != 0) {
+            this.selected = true;
+        } else {
+            this.selected = false;
+        }
+        this.needDraw = true;
+    }
+
+    resetState() {
+        this.selected = false;
+    }
 }
