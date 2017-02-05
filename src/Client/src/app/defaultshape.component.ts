@@ -33,6 +33,11 @@ export class DefaultshapeComponent {
         this.createModel(this.webapiUrl + '?type=' + 'sphere');
     }
 
+    reset(): void {
+        this.title = 'reset model';
+        this.retrieveModelService.reset();
+    }
+
     createModel(urlwithquery: string): void {
         var modelPromise = this.http.get(urlwithquery)
              .toPromise()
@@ -40,7 +45,7 @@ export class DefaultshapeComponent {
         modelPromise.then(p => {
             if(p) {
                 var d = JSON.parse(p);
-                this.retrieveModelService.setModel(d);
+                this.retrieveModelService.addModel(d);
             }
         });
     }

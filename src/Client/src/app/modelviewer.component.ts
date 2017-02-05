@@ -3,7 +3,7 @@
 import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { Http, Response, Headers } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
-import { Face } from './model';
+import { Face, Model } from './model';
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';      
@@ -27,8 +27,7 @@ export class ModelViewerComponent implements OnInit {
     dragging: boolean;
     lastX: number;
     lastY: number;
-    surface: Face = new Face();
-    selected: boolean;
+    models: Model[] = [];
     needDraw: boolean = true;
 
     constructor(private retrieveModelService: RetrieveModelService) {
@@ -37,9 +36,8 @@ export class ModelViewerComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.retrieveModelService.modelRetrieved().subscribe(m => {
-            this.drawRetrievedModel(m);
-        });
+        this.retrieveModelService.modelRetrieved().subscribe(m => this.drawRetrievedModel(m));
+        this.retrieveModelService.modelReset().subscribe(() => this.resetModel() );
 
         if(!this.mainviewer) {
             console.log('ngOnInit: Fail to retrieve the mainviewer <canvas> element');
@@ -133,36 +131,42 @@ export class ModelViewerComponent implements OnInit {
 
     drawRetrievedModel(m) : void {
         console.log('model retrieved %s', m);
-        var d = JSON.parse(m);
         var surfaceVertices:number[] = [];
         var surfaceNormals:number[] = [];
         var n:number = 0;
-        for(let f of d.Faces) {
-            for(let v of f.Vertices) {
-                i = i + 3;
-                surfaceVertices.push(v.X);
-                surfaceVertices.push(v.Y);
-                surfaceVertices.push(v.Z);
-                n = n + 1;
-            }
-            for(var j = 0; j < f.Vertices.length * 3; j = j + 3) {
-                surfaceNormals.push(f.Normal.X);
-                surfaceNormals.push(f.Normal.Y);
-                surfaceNormals.push(f.Normal.Z);
+        if (m != null) {
+            var d = JSON.parse(m);
+            for (let f of d.Faces) {
+                for (let v of f.Vertices) {
+                    i = i + 3;
+                    surfaceVertices.push(v.X);
+                    surfaceVertices.push(v.Y);
+                    surfaceVertices.push(v.Z);
+                    n = n + 1;
+                }
+                for (var j = 0; j < f.Vertices.length * 3; j = j + 3) {
+                    surfaceNormals.push(f.Normal.X);
+                    surfaceNormals.push(f.Normal.Y);
+                    surfaceNormals.push(f.Normal.Z);
+                }
             }
         }
 
-        this.surface.n = n;
-        this.surface.vertices = new Float32Array(n * 3);
-        this.surface.normals = new Float32Array(n * 3);
+        var surface = new Face();
+        surface.n = n;
+        surface.vertices = new Float32Array(n * 3);
+        surface.normals = new Float32Array(n * 3);
         for(var i = 0; i < surfaceVertices.length; i++) {
-            this.surface.vertices[i] = surfaceVertices[i];
+            surface.vertices[i] = surfaceVertices[i];
         }
         for(var i = 0; i < surfaceNormals.length; i++) {
-            this.surface.normals[i] = surfaceNormals[i];
+            surface.normals[i] = surfaceNormals[i];
         }
         
-        this.resetState();
+        var model = new Model();
+        model.surface = surface;
+        this.models.push(model);
+
         this.needDraw = true;
         this.draw();
     }
@@ -175,22 +179,29 @@ export class ModelViewerComponent implements OnInit {
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
         this.gl.enable(this.gl.DEPTH_TEST);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+        this.gl.uniformMatrix4fv(this.u_ModelMatrix, false, this.modelMatrix.elements);
 
+        for(var i = 0; i < this.models.length; i++) {
+            var m = this.models[i];
+            this.drawModel(m);
+        }       
+
+        this.needDraw = false;
+    }
+
+    drawModel(m: Model) {
         var a_Color = this.gl.getUniformLocation(this.program, 'a_Color');
-        if (this.selected) {
+        if (m.selected) {
             this.gl.uniform4f(a_Color, 1.0, 1.0, 0.0, 1.0);
         } else {
             this.gl.uniform4f(a_Color, 1.0, 0.0, 0.0, 1.0);
         }
 
-        if(this.surface.n > 0) {
-            this.gl.uniformMatrix4fv(this.u_ModelMatrix, false, this.modelMatrix.elements);
-            this.initArrayBuffer(this.surface.vertices, 3, this.gl.FLOAT, 'a_Position');
-            this.initArrayBuffer(this.surface.normals, 3, this.gl.FLOAT, 'a_Normal');
-            this.gl.drawArrays(this.gl.TRIANGLES, 0, this.surface.n);
+        if (m.surface.n > 0) {
+            this.initArrayBuffer(m.surface.vertices, 3, this.gl.FLOAT, 'a_Position');
+            this.initArrayBuffer(m.surface.normals, 3, this.gl.FLOAT, 'a_Normal');
+            this.gl.drawArrays(this.gl.TRIANGLES, 0, m.surface.n);
         }
-
-        this.needDraw = false;
     }
 
     tick() {
@@ -223,18 +234,25 @@ export class ModelViewerComponent implements OnInit {
 
     checkSelection(x: number, y: number) {
         this.needDraw = true;
-        this.draw();
+        this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        this.gl.enable(this.gl.DEPTH_TEST);
         var pixels = new Uint8Array(4);
-        this.gl.readPixels(x, y, 1, 1, this.gl.RGBA, this.gl.UNSIGNED_BYTE, pixels);
-        if (pixels[0] != 0 || pixels[1] != 0 || pixels[2] != 0) {
-            this.selected = true;
-        } else {
-            this.selected = false;
-        }
+        for (var i = 0; i < this.models.length; i++) {
+            this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+            var m = this.models[i];
+            m.selected = false;
+            this.drawModel(m);
+            this.gl.readPixels(x, y, 1, 1, this.gl.RGBA, this.gl.UNSIGNED_BYTE, pixels);
+            if (pixels[0] != 0 || pixels[1] != 0 || pixels[2] != 0) {
+                m.selected = true;
+            }
+        }     
+
         this.needDraw = true;
     }
 
-    resetState() {
-        this.selected = false;
+    resetModel() {
+        this.models = [];
+        this.needDraw = true;
     }
 }
