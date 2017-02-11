@@ -20,8 +20,7 @@ export class ModelViewerComponent implements OnInit {
     @ViewChild('mainviewer') mainviewer;
     title = 'model viewer';
     currentAngle: number[] = [0.0, 0.0];
-    modelMatrix: any;
-    u_ModelMatrix: any;
+    viewMatrix: any;
     gl: any;
     program: any;
     dragging: boolean;
@@ -32,7 +31,7 @@ export class ModelViewerComponent implements OnInit {
 
     constructor(private retrieveModelService: RetrieveModelService) {
         var cm = require("./common/coun-matrix");
-        this.modelMatrix = new cm.Matrix4();
+        this.viewMatrix = new cm.Matrix4();
     }
 
     ngOnInit(): void {
@@ -56,8 +55,6 @@ export class ModelViewerComponent implements OnInit {
         }
         this.gl.useProgram(this.program);
         this.gl.viewport(0, 0, this.mainviewer.nativeElement.width, this.mainviewer.nativeElement.height);
-
-        this.u_ModelMatrix = this.gl.getUniformLocation(this.program, 'u_xformMatrix');
         
         this.setLight();
         
@@ -99,8 +96,8 @@ export class ModelViewerComponent implements OnInit {
                     this.lastX = x;
                     this.lastY = y;
 
-                    this.modelMatrix.rotate(-1 * this.currentAngle[0], 1.0, 0.0, 0.0);
-                    this.modelMatrix.rotate(-1 * this.currentAngle[1], 0.0, 1.0, 0.0);
+                    this.viewMatrix.rotate(-1 * this.currentAngle[0], 1.0, 0.0, 0.0);
+                    this.viewMatrix.rotate(-1 * this.currentAngle[1], 0.0, 1.0, 0.0);
                     this.currentAngle = [0.0, 0.0];
 
                     this.needDraw = true;
@@ -109,7 +106,11 @@ export class ModelViewerComponent implements OnInit {
                     var dy = (y - this.lastY)/canvas.height;
                     this.lastX = x;
                     this.lastY = y;
-                    this.modelMatrix.translate(dx, -1*dy, 0);
+                    var selectedModels = this.getSelectedModels();
+                    for(var i = 0; i < selectedModels.length; i++) {
+                        var m = selectedModels[i];
+                        m.modelMatrix.translate(dx, -1*dy, 0);
+                    }
                     this.needDraw = true;
                 } else {
                     this.needDraw = false;
@@ -121,9 +122,9 @@ export class ModelViewerComponent implements OnInit {
             var scaledown = 0.9;
             var scaleup = 1.1;
             if (ev.wheelDelta < 0) {
-                this.modelMatrix.scale(scaledown, scaledown, scaledown);
+                this.viewMatrix.scale(scaledown, scaledown, scaledown);
             } else if (ev.wheelDelta > 0) {
-                this.modelMatrix.scale(scaleup, scaleup, scaleup);
+                this.viewMatrix.scale(scaleup, scaleup, scaleup);
             }
             this.needDraw = true;
         }
@@ -179,7 +180,9 @@ export class ModelViewerComponent implements OnInit {
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
         this.gl.enable(this.gl.DEPTH_TEST);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-        this.gl.uniformMatrix4fv(this.u_ModelMatrix, false, this.modelMatrix.elements);
+
+        var u_viewMatrix = this.gl.getUniformLocation(this.program, 'u_viewMatrix');
+        this.gl.uniformMatrix4fv(u_viewMatrix, false, this.viewMatrix.elements);
 
         for(var i = 0; i < this.models.length; i++) {
             var m = this.models[i];
@@ -196,7 +199,8 @@ export class ModelViewerComponent implements OnInit {
         } else {
             this.gl.uniform4f(a_Color, 1.0, 0.0, 0.0, 1.0);
         }
-
+        var u_modelMatrix = this.gl.getUniformLocation(this.program, 'u_modelMatrix');
+        this.gl.uniformMatrix4fv(u_modelMatrix, false, m.modelMatrix.elements);
         if (m.surface.n > 0) {
             this.initArrayBuffer(m.surface.vertices, 3, this.gl.FLOAT, 'a_Position');
             this.initArrayBuffer(m.surface.normals, 3, this.gl.FLOAT, 'a_Normal');
@@ -249,6 +253,17 @@ export class ModelViewerComponent implements OnInit {
         }     
 
         this.needDraw = true;
+    }
+
+    getSelectedModels() {
+        var selectedModels:Model[] = [];
+        for (var i = 0; i < this.models.length; i++) {
+            var m = this.models[i];
+            if(m.selected) {
+                selectedModels.push(m);
+            }
+        }
+        return selectedModels;
     }
 
     resetModel() {
