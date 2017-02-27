@@ -4,10 +4,9 @@ import { Observable } from 'rxjs/Observable';
 
 @Injectable()
 export class RetrieveModelService {
-    constructor() {}
-    model: any;
-    newModel: Subject<any> = new Subject<any>();
-    resetModel: Subject<any> = new Subject<any>();
+    private model: any;
+    private newModel: Subject<any> = new Subject<any>();
+    private resetModel: Subject<any> = new Subject<any>();
 
     addModel(m) {
         this.model = m;

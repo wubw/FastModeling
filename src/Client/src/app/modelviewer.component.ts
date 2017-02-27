@@ -10,6 +10,10 @@ import 'rxjs/add/operator/catch';
 
 import { RetrieveModelService } from './retrieve.model.service';
 
+declare let initShaders:any;
+declare let Matrix4:any;
+declare let Vector3:any;
+
 @Component({
   selector: 'model-viewer',
   templateUrl: './modelviewer.component.html',
@@ -30,8 +34,7 @@ export class ModelViewerComponent implements OnInit {
     needDraw: boolean = true;
 
     constructor(private retrieveModelService: RetrieveModelService) {
-        var cm = require("./common/coun-matrix");
-        this.viewMatrix = new cm.Matrix4();
+        this.viewMatrix = new Matrix4();
     }
 
     ngOnInit(): void {
@@ -47,8 +50,8 @@ export class ModelViewerComponent implements OnInit {
             alert("Unable to initialize WebGL. Your browser may not support it.");
             return;
         }
-        var ir = require("./common/initShaders2");
-        this.program = ir.initShaders(this.gl, "app/shader/vshader.glsl", "app/shader/fshader.glsl");
+
+        this.program = initShaders(this.gl, "app/shader/vshader.glsl", "app/shader/fshader.glsl");
         if(!this.program) {
             console.log('Failed to init shaders');
             return;
@@ -217,8 +220,7 @@ export class ModelViewerComponent implements OnInit {
         var u_LightColor = this.gl.getUniformLocation(this.program, 'u_LightColor');
         var u_LightDirection = this.gl.getUniformLocation(this.program, 'u_LightDirection');
         this.gl.uniform3f(u_LightColor, 1.0, 1.0, 1.0);
-        var cm = require("./common/coun-matrix");
-        var lightDirection = new cm.Vector3([5, 3.0, 4.0]);
+        var lightDirection = new Vector3([5, 3.0, 4.0]);
         lightDirection.normalize();
         this.gl.uniform3fv(u_LightDirection, lightDirection.elements);
         var u_AmbientLight = this.gl.getUniformLocation(this.program, 'u_AmbientLight');
