@@ -14,24 +14,18 @@ import { DefaultshapeComponent } from './defaultshape.component';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
+  private webapiUrl = 'http://localhost:5682/api/Greet';
+  title: string;
   constructor(private http: Http) {}
 
-  webapiUrl = 'http://localhost:5682/api/Greet';
-  data = this.http.get(this.webapiUrl)
-    .toPromise()
-    .then(response => response.json().data as string[]);
-  title: string;
-
-  getTitle(): Observable<string> {
+  private getTitle(): Observable<string> {
     return this.http.get(this.webapiUrl)
                     .map(r => r.text())
                     .catch(this.handleError);
   }
 
   ngOnInit(): void {
-      this.getTitle().forEach(t => { 
-          this.title = t;
-        });
+      this.getTitle().subscribe((t) => {this.title = t;});
   }
 
   private handleError (error: Response | any) {

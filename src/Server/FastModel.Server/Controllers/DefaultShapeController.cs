@@ -171,17 +171,18 @@ namespace FastModel.Server.Controllers
 
         private static void GetPlaneModel(Model model)
         {
+            const double z = 0d;
             var face = new Face();
-            face.Vertices.Add(new Point {X = -0.5, Y = -0.5, Z = -0.5});
-            face.Vertices.Add(new Point {X = -0.5, Y = 0.5, Z = -0.5});
-            face.Vertices.Add(new Point {X = 0.5, Y = -0.5, Z = -0.5});
+            face.Vertices.Add(new Point {X = -0.5, Y = -0.5, Z = z });
+            face.Vertices.Add(new Point {X = -0.5, Y = 0.5, Z = z });
+            face.Vertices.Add(new Point {X = 0.5, Y = -0.5, Z = z });
             face.Normal = new Vector {X = 0, Y = 0, Z = 1.0};
             model.Faces.Add(face);
 
             face = new Face();
-            face.Vertices.Add(new Point { X = -0.5, Y = 0.5, Z = -0.5 });
-            face.Vertices.Add(new Point { X = 0.5, Y = -0.5, Z = -0.5 });
-            face.Vertices.Add(new Point { X = 0.5, Y = 0.5, Z = -0.5 });
+            face.Vertices.Add(new Point { X = -0.5, Y = 0.5, Z = z });
+            face.Vertices.Add(new Point { X = 0.5, Y = -0.5, Z = z });
+            face.Vertices.Add(new Point { X = 0.5, Y = 0.5, Z = z });
             face.Normal = new Vector { X = 0, Y = 0, Z = 1.0 };
             model.Faces.Add(face);
         }

@@ -1,5 +1,3 @@
-/// <reference path="./common/webgl-utils.d.ts" />
-
 import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { Http, Response, Headers } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
@@ -22,16 +20,15 @@ declare let Vector3:any;
 })
 export class ModelViewerComponent implements OnInit {
     @ViewChild('mainviewer') mainviewer;
-    title = 'model viewer';
-    currentAngle: number[] = [0.0, 0.0];
-    viewMatrix: any;
-    gl: any;
-    program: any;
-    dragging: boolean;
-    lastX: number;
-    lastY: number;
-    models: Model[] = [];
-    needDraw: boolean = true;
+    private currentAngle: number[] = [0.0, 0.0];
+    private viewMatrix: any;
+    private gl: any;
+    private program: any;
+    private dragging: boolean;
+    private lastX: number;
+    private lastY: number;
+    private models: Model[] = [];
+    private needDraw: boolean = true;
 
     constructor(private retrieveModelService: RetrieveModelService) {
         this.viewMatrix = new Matrix4();
@@ -64,7 +61,7 @@ export class ModelViewerComponent implements OnInit {
         this.tick();
     }
 
-    initEventHandlers(canvas) {
+    private initEventHandlers(canvas) {
         this.dragging = false;
         this.lastX = -1;
         this.lastY = -1;
@@ -133,7 +130,7 @@ export class ModelViewerComponent implements OnInit {
         }
     }
 
-    drawRetrievedModel(m) : void {
+    private drawRetrievedModel(m) : void {
         console.log('model retrieved %s', m);
         var surfaceVertices:number[] = [];
         var surfaceNormals:number[] = [];
@@ -175,7 +172,7 @@ export class ModelViewerComponent implements OnInit {
         this.draw();
     }
 
-    draw(): void {
+    private draw(): void {
         if(!this.needDraw) {
             return;
         }
@@ -195,7 +192,7 @@ export class ModelViewerComponent implements OnInit {
         this.needDraw = false;
     }
 
-    drawModel(m: Model) {
+    private drawModel(m: Model) {
         var a_Color = this.gl.getUniformLocation(this.program, 'a_Color');
         if (m.selected) {
             this.gl.uniform4f(a_Color, 1.0, 1.0, 0.0, 1.0);
@@ -211,12 +208,12 @@ export class ModelViewerComponent implements OnInit {
         }
     }
 
-    tick() {
+    private tick() {
         this.draw();
         requestAnimationFrame(() => {this.tick()});
     }
 
-    setLight(): void {
+    private setLight(): void {
         var u_LightColor = this.gl.getUniformLocation(this.program, 'u_LightColor');
         var u_LightDirection = this.gl.getUniformLocation(this.program, 'u_LightDirection');
         this.gl.uniform3f(u_LightColor, 1.0, 1.0, 1.0);
@@ -227,7 +224,7 @@ export class ModelViewerComponent implements OnInit {
         this.gl.uniform3f(u_AmbientLight, 0.2, 0.2, 0.2);
     }
 
-    initArrayBuffer(data, num: number, type, attribute:string): boolean {
+    private initArrayBuffer(data, num: number, type, attribute:string): boolean {
         var buffer = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
         this.gl.bufferData(this.gl.ARRAY_BUFFER, data, this.gl.STATIC_DRAW);
@@ -238,7 +235,7 @@ export class ModelViewerComponent implements OnInit {
         return true;
     } 
 
-    checkSelection(x: number, y: number) {
+    private checkSelection(x: number, y: number) {
         this.needDraw = true;
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
         this.gl.enable(this.gl.DEPTH_TEST);
@@ -257,7 +254,7 @@ export class ModelViewerComponent implements OnInit {
         this.needDraw = true;
     }
 
-    getSelectedModels() {
+    private getSelectedModels() {
         var selectedModels:Model[] = [];
         for (var i = 0; i < this.models.length; i++) {
             var m = this.models[i];
@@ -268,7 +265,7 @@ export class ModelViewerComponent implements OnInit {
         return selectedModels;
     }
 
-    resetModel() {
+    private resetModel() {
         this.models = [];
         this.needDraw = true;
     }

@@ -38,7 +38,7 @@ export class DefaultshapeComponent {
         this.retrieveModelService.reset();
     }
 
-    createModel(urlwithquery: string): void {
+    private createModel(urlwithquery: string): void {
         var modelPromise = this.http.get(urlwithquery)
              .toPromise()
              .then(r => r.text());
