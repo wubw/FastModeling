@@ -14,7 +14,7 @@ import { DefaultshapeComponent } from './defaultshape.component';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  private webapiUrl = 'http://localhost:5682/api/Greet';
+  private webapiUrl = 'http://localhost:56822/api/Greet';
   title: string;
   constructor(private http: Http) {}
 

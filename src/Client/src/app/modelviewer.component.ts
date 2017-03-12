@@ -8,10 +8,6 @@ import 'rxjs/add/operator/catch';
 
 import { RetrieveModelService } from './retrieve.model.service';
 
-declare let initShaders:any;
-declare let Matrix4:any;
-declare let Vector3:any;
-
 @Component({
   selector: 'model-viewer',
   templateUrl: './modelviewer.component.html',
@@ -31,7 +27,8 @@ export class ModelViewerComponent implements OnInit {
     private needDraw: boolean = true;
 
     constructor(private retrieveModelService: RetrieveModelService) {
-        this.viewMatrix = new Matrix4();
+        var cm = require("./common/coun-matrix");
+        this.viewMatrix = new cm.Matrix4();
     }
 
     ngOnInit(): void {
@@ -41,14 +38,18 @@ export class ModelViewerComponent implements OnInit {
         if(!this.mainviewer) {
             console.log('ngOnInit: Fail to retrieve the mainviewer <canvas> element');
         }
+        console.log(this.mainviewer);
+        console.log(this.mainviewer.nativeElement);
         this.gl  = this.mainviewer.nativeElement.getContext('webgl');
+        console.log(this.gl);
         this.initEventHandlers(this.mainviewer.nativeElement);
         if (!this.gl) {
             alert("Unable to initialize WebGL. Your browser may not support it.");
             return;
         }
 
-        this.program = initShaders(this.gl, "app/shader/vshader.glsl", "app/shader/fshader.glsl");
+        var is = require("./common/initShaders2");
+        this.program = is.initShaders(this.gl, "src/app/shader/vshader.glsl", "src/app/shader/fshader.glsl");
         if(!this.program) {
             console.log('Failed to init shaders');
             return;
@@ -217,7 +218,8 @@ export class ModelViewerComponent implements OnInit {
         var u_LightColor = this.gl.getUniformLocation(this.program, 'u_LightColor');
         var u_LightDirection = this.gl.getUniformLocation(this.program, 'u_LightDirection');
         this.gl.uniform3f(u_LightColor, 1.0, 1.0, 1.0);
-        var lightDirection = new Vector3([5, 3.0, 4.0]);
+        var cm = require("./common/coun-matrix");
+        var lightDirection = new cm.Vector3([5, 3.0, 4.0]);
         lightDirection.normalize();
         this.gl.uniform3fv(u_LightDirection, lightDirection.elements);
         var u_AmbientLight = this.gl.getUniformLocation(this.program, 'u_AmbientLight');

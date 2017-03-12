@@ -40,3 +40,5 @@ function initShaders(gl, vShaderName, fShaderName) {
     
     return program;
 };
+
+module.exports = {initShaders: initShaders}

@@ -16,7 +16,7 @@ export class DefaultshapeComponent {
     constructor(private http: Http, private retrieveModelService: RetrieveModelService) {}
 
     title = 'default shape component';
-    webapiUrl = 'http://localhost:5682/api/DefaultShape';
+    webapiUrl = 'http://localhost:56822/api/DefaultShape';
 
     createPlane(): void {
         this.title = 'create plane';
